@@ -1,0 +1,44 @@
+make:
+	make user_interface
+	make vg
+	make clean
+
+test:
+	make buisness_tests
+	make vg
+
+text:
+	make user_interface
+	valgrind --leak-check=full ./a.out < text_file_test.txt
+
+user_interface: buisness_logic.o hash_table.o linked_list.o utils.o interface_inputs.o
+	gcc -g user_interface.c $^
+
+interface_inputs.o: buisness_logic.o utils.o interface_inputs.c interface_inputs.h
+	gcc -g -c interface_inputs.c 
+
+utils.o: utils.c utils.h
+	gcc -g -c utils.c
+
+buisness_tests: linked_list.o hash_table.o buisness_logic.o
+	gcc -ggdb -std=c11 $^ buisness_logic_tests.c -lcunit 
+
+buisness_logic.o: hash_table.o buisness_logic.c buisness_logic.h
+	gcc -g -c buisness_logic.c 
+
+buisness_logic_tests.o: buisness_logic_tests.c
+	gcc -g -c buisness_logic_tests.c 
+
+hash_table.o: linked_list.o hash_table.c hash_table.h 
+	gcc -g -c hash_table.c 
+
+linked_list.o: linked_list.c linked_list.h iterator.h common.h
+	gcc -g -c linked_list.c 
+
+vg:
+	valgrind --leak-check=full ./a.out
+
+clean:
+	rm buisness.o buisness_logic.o buisness_logic_tests.o utils.o interface_inputs.o hash_table.o linked_list.o
+
+
